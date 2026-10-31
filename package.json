@@ -1,0 +1,30 @@
+{
+  "name": "biocella-fullstack",
+  "version": "1.0.0",
+  "description": "BIOCELLA - Mặt Nạ Sinh Học Men Dừa (Fullstack Node.js + Express + MySQL)",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js",
+    "server": "node backend/server.js",
+    "init-db": "node backend/database/init-db.js"
+  },
+  "keywords": [
+    "biocella",
+    "mysql",
+    "express",
+    "ecommerce",
+    "fullstack"
+  ],
+  "author": "BIOCELLA Lab",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mysql2": "^3.9.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}

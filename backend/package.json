@@ -1,0 +1,23 @@
+{
+  "name": "biocella-backend",
+  "version": "1.0.0",
+  "description": "Backend REST API cho cửa hàng BIOCELLA sử dụng Node.js, Express và MySQL",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "init-db": "node database/init-db.js"
+  },
+  "keywords": ["biocella", "mysql", "express", "ecommerce"],
+  "author": "BIOCELLA Lab",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mysql2": "^3.9.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}

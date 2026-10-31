@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BIOCELLA Admin - Hệ Thống Quản Trị Mặt Nạ Sinh Học</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>" />
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+
+  <!-- Admin Login Overlay -->
+  <div class="admin-login-overlay" id="admin-login-overlay">
+    <div class="login-card">
+      <div class="login-badge">B</div>
+      <h2 class="login-title">Đăng Nhập Quản Trị</h2>
+      <p class="login-desc">Hệ thống quản lý cửa hàng Mặt Nạ Sinh Học BIOCELLA</p>
+
+      <!-- Account Hint Box -->
+      <div class="demo-account-box">
+        <div class="demo-title">
+          <span>🔑 Tài khoản quản trị mặc định:</span>
+          <button type="button" id="quick-fill-login-btn" style="background: none; border: none; color: #047857; text-decoration: underline; cursor: pointer; font-size: 0.75rem; font-weight: 700;">Tự động điền</button>
+        </div>
+        <div style="margin-top: 4px;">Tài khoản: <code>admin</code> (hoặc <code>admin@biocella.vn</code>)</div>
+        <div style="margin-top: 2px;">Mật khẩu: <code>admin123</code></div>
+      </div>
+
+      <form id="admin-login-form">
+        <div class="admin-form-group" style="text-align: left; margin-bottom: 1rem;">
+          <label>Tên đăng nhập / Email *</label>
+          <input type="text" id="login-username" placeholder="Nhập admin hoặc email..." required value="admin" />
+        </div>
+
+        <div class="admin-form-group" style="text-align: left; margin-bottom: 1.25rem;">
+          <label>Mật khẩu quản trị *</label>
+          <input type="password" id="login-password" placeholder="Nhập mật khẩu..." required value="admin123" />
+        </div>
+
+        <div id="login-error-msg" style="display: none; color: #dc2626; font-size: 0.8rem; font-weight: 700; margin-bottom: 1rem; text-align: left;">
+          ✕ Sai tên đăng nhập hoặc mật khẩu!
+        </div>
+
+        <button type="submit" class="admin-btn admin-btn-primary" style="width: 100%; padding: 0.85rem; font-size: 0.95rem;">
+          Đăng Nhập Vào Hệ Thống
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Admin Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand-badge">B</div>
+      <div>
+        <div class="sidebar-brand-title">BIOCELLA</div>
+        <div class="sidebar-brand-sub">Hệ Thống Quản Trị CMS</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Kinh Doanh</div>
+      <button class="admin-nav-item active" data-tab="overview">
+        <span class="nav-icon">📊</span>
+        <span>Tổng Quan</span>
+      </button>
+      <button class="admin-nav-item" data-tab="products">
+        <span class="nav-icon">📦</span>
+        <span>Quản Lý Sản Phẩm</span>
+      </button>
+      <button class="admin-nav-item" data-tab="orders">
+        <span class="nav-icon">📑</span>
+        <span>Quản Lý Đơn Hàng</span>
+      </button>
+      <button class="admin-nav-item" data-tab="vouchers">
+        <span class="nav-icon">🏷️</span>
+        <span>Mã Giảm Giá (Voucher)</span>
+      </button>
+
+      <div class="nav-section-title">Hệ Thống</div>
+      <button class="admin-nav-item" data-tab="settings">
+        <span class="nav-icon">⚙️</span>
+        <span>Cài Đặt Nội Dung Web</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="index.html" class="view-store-btn" target="_blank" style="margin-bottom: 0.5rem;">
+        <span>🌐</span>
+        <span>Xem Cửa Hàng Trực Tuyến</span>
+      </a>
+      <button class="view-store-btn" id="admin-logout-btn" style="background: rgba(239, 68, 68, 0.15); color: #fca5a5; border-color: rgba(239, 68, 68, 0.3); width: 100%; cursor: pointer;">
+        <span>🚪</span>
+        <span>Đăng Xuất</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Admin Main Area -->
+  <main class="admin-main">
+    <!-- Topbar -->
+    <header class="admin-topbar">
+      <div class="topbar-title">
+        <h2 id="admin-page-title">Tổng Quan Kinh Doanh</h2>
+        <p id="admin-page-subtitle">Thống kê doanh số, đơn hàng và tỷ lệ chuyển đổi</p>
+      </div>
+
+      <div class="topbar-actions">
+        <button class="admin-btn admin-btn-outline" id="reset-all-data-btn" title="Khôi phục lại dữ liệu mẫu gốc">
+          <span>🔄</span>
+          <span>Khôi Phục Dữ Liệu Mẫu</span>
+        </button>
+
+        <div style="display: flex; align-items: center; gap: 0.75rem; border-left: 1px solid var(--admin-border); padding-left: 1rem;">
+          <img src="https://images.unsplash.com/photo-1594824813589-3221e5494cb8?auto=format&fit=crop&w=80&q=80" alt="Admin" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover;" />
+          <div style="font-size: 0.85rem; line-height: 1.2;">
+            <div style="font-weight: 700;">Quản Trị Viên</div>
+            <div style="font-size: 0.72rem; color: #10b981;">● Đang hoạt động</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Admin Body Views -->
+    <div class="admin-body">
+
+      <!-- ================= TAB 1: OVERVIEW ================= -->
+      <section class="admin-tab-pane active" id="tab-overview">
+        <!-- KPI Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">Tổng Doanh Thu</span>
+              <div class="kpi-icon">💰</div>
+            </div>
+            <div class="kpi-value" id="kpi-revenue">0đ</div>
+            <div class="kpi-trend">↑ +18.4% so với tháng trước</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">Tổng Đơn Hàng</span>
+              <div class="kpi-icon">🛒</div>
+            </div>
+            <div class="kpi-value" id="kpi-orders-count">0</div>
+            <div class="kpi-trend" id="kpi-pending-count">0 đơn chờ</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">Mặt Nạ Đang Bán</span>
+              <div class="kpi-icon">🥥</div>
+            </div>
+            <div class="kpi-value" id="kpi-products-count">0</div>
+            <div class="kpi-trend" style="color: var(--admin-primary);">Chuẩn vi sinh y khoa</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">Đánh Giá Trung Bình</span>
+              <div class="kpi-icon">⭐</div>
+            </div>
+            <div class="kpi-value">4.9 / 5.0</div>
+            <div class="kpi-trend">Từ 1.200+ khách hàng thật</div>
+          </div>
+        </div>
+
+        <!-- Recent Orders Table -->
+        <div class="admin-card">
+          <div class="card-header-row">
+            <div>
+              <h3>Đơn Đặt Hàng Gần Đây</h3>
+              <p>Các giao dịch COD & VietQR mới phát sinh từ khách hàng</p>
+            </div>
+            <button class="admin-btn admin-btn-outline" onclick="document.querySelector('[data-tab=orders]').click();">
+              Xem tất cả đơn hàng →
+            </button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Mã Đơn</th>
+                  <th>Khách Hàng</th>
+                  <th>Số Lượng</th>
+                  <th>Tổng Tiền</th>
+                  <th>Trạng Thái</th>
+                  <th>Ngày Đặt</th>
+                </tr>
+              </thead>
+              <tbody id="overview-recent-orders">
+                <!-- Injected by admin.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 2: PRODUCTS MANAGER ================= -->
+      <section class="admin-tab-pane" id="tab-products">
+        <div class="admin-card">
+          <div class="card-header-row">
+            <div>
+              <h3>Danh Sách Mặt Nạ Sinh Học</h3>
+              <p>Quản lý các dòng mặt nạ men dừa B5, Niacinamide, Cica, Collagen và Combo</p>
+            </div>
+            <button class="admin-btn admin-btn-primary" id="add-product-btn">
+              <span>+ Thêm Mặt Nạ Mới</span>
+            </button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th style="width: 35%;">Sản Phẩm & Phân Loại</th>
+                  <th>Danh Mục</th>
+                  <th>Giá Bán</th>
+                  <th>Đánh Giá</th>
+                  <th>Đã Bán</th>
+                  <th>Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody id="admin-products-table-body">
+                <!-- Injected by admin.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 3: ORDERS MANAGER ================= -->
+      <section class="admin-tab-pane" id="tab-orders">
+        <div class="admin-card">
+          <div class="card-header-row">
+            <div>
+              <h3>Tất Cả Đơn Đặt Hàng</h3>
+              <p>Xem thông tin người nhận, địa chỉ giao hàng và thay đổi trạng thái xử lý</p>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Mã Đơn</th>
+                  <th>Người Nhận & Liên Hệ</th>
+                  <th>Sản Phẩm Đặt</th>
+                  <th>Thanh Toán</th>
+                  <th>Trạng Thái</th>
+                  <th>Thời Gian</th>
+                  <th>Hành Động</th>
+                </tr>
+              </thead>
+              <tbody id="admin-orders-table-body">
+                <!-- Injected by admin.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 4: VOUCHERS MANAGER ================= -->
+      <section class="admin-tab-pane" id="tab-vouchers">
+        <div class="form-grid-2">
+          <!-- Add Voucher Form -->
+          <div class="admin-card">
+            <div class="card-header-row">
+              <h3>Tạo Mã Giảm Giá Mới</h3>
+            </div>
+            <form id="add-voucher-form">
+              <div class="admin-form-group">
+                <label>Mã Voucher (Viết hoa, liền nhau) *</label>
+                <input type="text" id="vouch-code" placeholder="VD: BIOCELLA20" required style="text-transform: uppercase;" />
+              </div>
+
+              <div class="admin-form-group">
+                <label>Tên / Mô tả ngắn ưu đãi *</label>
+                <input type="text" id="vouch-label" placeholder="VD: Giảm 20% mừng đại lễ" required />
+              </div>
+
+              <div class="form-grid-2">
+                <div class="admin-form-group">
+                  <label>Loại giảm giá *</label>
+                  <select id="vouch-type">
+                    <option value="percent">Phần trăm (%)</option>
+                    <option value="fixed">Số tiền cố định (đ)</option>
+                  </select>
+                </div>
+
+                <div class="admin-form-group">
+                  <label>Giá trị giảm *</label>
+                  <input type="number" id="vouch-val" placeholder="VD: 15 hoặc 50000" required min="1" />
+                </div>
+              </div>
+
+              <div class="admin-form-group">
+                <label>Giá trị đơn hàng tối thiểu (₫)</label>
+                <input type="number" id="vouch-min" placeholder="0 nếu không yêu cầu" value="0" />
+                <div class="form-help">Khách hàng cần mua từ mức tiền này trở lên mới áp được mã</div>
+              </div>
+
+              <button type="submit" class="admin-btn admin-btn-primary" style="width: 100%;">
+                Lưu Mã Voucher
+              </button>
+            </form>
+          </div>
+
+          <!-- Existing Vouchers List -->
+          <div class="admin-card">
+            <div class="card-header-row">
+              <h3>Mã Voucher Đang Hoạt Động</h3>
+            </div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Mã</th>
+                    <th>Nội Dung</th>
+                    <th>Mức Giảm</th>
+                    <th>ĐK Áp Dụng</th>
+                    <th>Xóa</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-vouchers-table-body">
+                  <!-- Injected by admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 5: SITE SETTINGS ================= -->
+      <section class="admin-tab-pane" id="tab-settings">
+        <div class="admin-card">
+          <div class="card-header-row">
+            <div>
+              <h3>Cài Đặt Nội Dung & Nhận Diện Website</h3>
+              <p>Mọi thay đổi sẽ ngay lập tức được cập nhật trực tiếp lên trang chủ bán hàng</p>
+            </div>
+            <button type="submit" form="site-settings-form" class="admin-btn admin-btn-primary">
+              💾 Lưu Thay Đổi Nội Dung
+            </button>
+          </div>
+
+          <form id="site-settings-form">
+            <h4 style="font-size: 1rem; font-weight: 700; color: var(--admin-primary); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--admin-border);">
+              1. Khung Thông Báo Trên Cùng (Announcement Bar) & Ngưỡng Vận Chuyển
+            </h4>
+
+            <div class="form-grid-2">
+              <div class="admin-form-group">
+                <label>Thông báo khuyến mãi đầu trang</label>
+                <input type="text" id="set-announcement" required />
+              </div>
+
+              <div class="admin-form-group">
+                <label>Thông báo chính sách vận chuyển</label>
+                <input type="text" id="set-shipping-notice" required />
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="admin-form-group">
+                <label>Ngưỡng đơn hàng được MIỄN PHÍ VẬN CHUYỂN (₫)</label>
+                <input type="number" id="set-freeship-threshold" required step="10000" />
+                <div class="form-help">Hệ thống sẽ tự động hiện thanh tiến trình freeship trong giỏ hàng</div>
+              </div>
+
+              <div class="admin-form-group">
+                <label>Hotline Chuyên Viên Dược Sĩ Tư Vấn</label>
+                <input type="text" id="set-hotline" required />
+              </div>
+            </div>
+
+            <h4 style="font-size: 1rem; font-weight: 700; color: var(--admin-primary); margin: 1.5rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--admin-border);">
+              2. Tiêu Đề & Lời Kêu Gọi Tại Hero Banner
+            </h4>
+
+            <div class="admin-form-group">
+              <label>Tiêu đề chính Hero Banner</label>
+              <input type="text" id="set-hero-title" required />
+            </div>
+
+            <div class="admin-form-group">
+              <label>Đoạn giới thiệu công nghệ sinh học</label>
+              <textarea id="set-hero-desc" rows="3" required></textarea>
+            </div>
+
+            <h4 style="font-size: 1rem; font-weight: 700; color: var(--admin-primary); margin: 1.5rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--admin-border);">
+              3. Cấu Hình Tài Khoản Chuyển Khoản Ngân Hàng (VietQR Tự Động)
+            </h4>
+
+            <div class="form-grid-2">
+              <div class="admin-form-group">
+                <label>Mã ngân hàng (Bank ID: MB, VCB, TCB, ACB, VPB...)</label>
+                <input type="text" id="set-bank-id" required style="text-transform: uppercase;" />
+              </div>
+
+              <div class="admin-form-group">
+                <label>Số tài khoản thụ hưởng</label>
+                <input type="text" id="set-bank-account" required />
+              </div>
+            </div>
+
+            <div class="admin-form-group">
+              <label>Tên chủ tài khoản (Viết in hoa không dấu)</label>
+              <input type="text" id="set-bank-owner" required />
+              <div class="form-help">Hệ thống sẽ tạo mã QR thanh toán động chính xác số tiền và số tài khoản này khi khách checkout</div>
+            </div>
+
+            <div style="margin-top: 2rem;">
+              <button type="submit" class="admin-btn admin-btn-primary" style="padding: 0.85rem 2.5rem; font-size: 1rem;">
+                💾 Lưu Thay Đổi Nội Dung
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ================= PRODUCT MODAL (ADD / EDIT) ================= -->
+  <div class="admin-modal-overlay" id="product-modal-overlay"></div>
+  <div class="admin-modal" id="product-modal">
+    <div class="admin-modal-header">
+      <h3 id="product-modal-title">Thêm Mặt Nạ Mới</h3>
+      <button class="close-product-modal-btn" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+    </div>
+
+    <form id="product-form">
+      <div class="admin-modal-body">
+        <div class="admin-form-group">
+          <label>Tên mặt nạ sinh học *</label>
+          <input type="text" id="prod-name" placeholder="VD: Mặt Nạ Sinh Học B5 & Hyaluronic..." required />
+        </div>
+
+        <div class="form-grid-2">
+          <div class="admin-form-group">
+            <label>Tiêu đề phụ tiếng Anh / công nghệ</label>
+            <input type="text" id="prod-subtitle" placeholder="VD: Deep Moisture & Barrier Repair..." />
+          </div>
+
+          <div class="admin-form-group">
+            <label>Phân loại chuyên biệt *</label>
+            <select id="prod-category">
+              <option value="recovery">💧 Cấp ẩm phục hồi</option>
+              <option value="brightening">✨ Trắng sáng mờ thâm</option>
+              <option value="acne">🌿 Trị mụn kiềm dầu</option>
+              <option value="anti-aging">👑 Nâng cơ trẻ hóa</option>
+              <option value="combo">🎁 Hộp quà combo</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="admin-form-group">
+            <label>Giá bán ưu đãi (₫) *</label>
+            <input type="number" id="prod-price" placeholder="65000" required step="1000" />
+          </div>
+
+          <div class="admin-form-group">
+            <label>Giá niêm yết gốc (₫)</label>
+            <input type="number" id="prod-original-price" placeholder="85000" step="1000" />
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="admin-form-group">
+            <label>Huy hiệu nổi bật (Badge)</label>
+            <input type="text" id="prod-badge" placeholder="VD: Bán Chạy Nhất, Mờ Thâm Sau 7 Ngày..." />
+          </div>
+
+          <div class="admin-form-group">
+            <label>Dung tích / Quy cách đóng gói</label>
+            <input type="text" id="prod-volume" placeholder="28ml / 1 miếng" />
+          </div>
+        </div>
+
+        <div class="admin-form-group">
+          <label>Đường dẫn hình ảnh (URL) *</label>
+          <input type="url" id="prod-image" placeholder="https://images.unsplash.com/..." required />
+          <div style="margin-top: 0.6rem; display: flex; align-items: center; gap: 1rem;">
+            <img id="form-img-preview" src="" alt="Xem trước ảnh" style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover; border: 1px solid var(--admin-border);" />
+            <span class="form-help">Xem trước ảnh thực tế của mặt nạ</span>
+          </div>
+        </div>
+
+        <div class="admin-form-group">
+          <label>Mô tả công dụng y khoa *</label>
+          <textarea id="prod-desc" rows="3" placeholder="Mặt nạ sợi sinh học dệt từ 100% nước dừa tươi lên men nguyên chất..."></textarea>
+        </div>
+
+        <div class="admin-form-group">
+          <label>Thành phần hoạt tính vàng (Mỗi dòng 1 thành phần theo cú pháp "Tên: Công dụng")</label>
+          <textarea id="prod-ingredients" rows="3" placeholder="Vitamin B5: Phục hồi mô tế bào&#10;5D Hyaluronic Acid: Cấp ẩm đa tầng"></textarea>
+        </div>
+      </div>
+
+      <div class="admin-modal-footer">
+        <button type="button" class="admin-btn admin-btn-outline close-product-modal-btn">Hủy</button>
+        <button type="submit" class="admin-btn admin-btn-primary">Lưu Sản Phẩm</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ================= ORDER DETAIL MODAL ================= -->
+  <div class="admin-modal-overlay" id="order-detail-overlay"></div>
+  <div class="admin-modal" id="order-detail-modal" style="max-width: 620px;">
+    <div class="admin-modal-header">
+      <h3>Chi Tiết Đơn Hàng</h3>
+      <button class="close-order-modal-btn" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+    </div>
+    <div class="admin-modal-body" id="order-detail-body">
+      <!-- Injected by admin.js -->
+    </div>
+    <div class="admin-modal-footer">
+      <button type="button" class="admin-btn admin-btn-outline close-order-modal-btn">Đóng</button>
+    </div>
+  </div>
+
+  <!-- Admin Toast Container -->
+  <div id="admin-toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 200;"></div>
+
+  <!-- Fallback datasets & Scripts -->
+  <script src="js/products.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
